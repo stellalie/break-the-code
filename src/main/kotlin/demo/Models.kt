@@ -14,7 +14,6 @@ abstract class Tile(
         Color.BLACK -> "$ANSI_BLACK_BACKGROUND$ANSI_WHITE $number $ANSI_RESET"
         Color.WHITE -> "$ANSI_WHITE_BACKGROUND$ANSI_BLACK $number $ANSI_RESET"
         Color.GREEN -> "$ANSI_GREEN $number $ANSI_RESET"
-        else -> throw IllegalStateException("Invalid color")
     }
 }
 
