@@ -14,7 +14,7 @@ abstract class Number(
 }
 
 object BLACK_0 : Number(0, Color.BLACK)
-object WHITE_0: Number(0, Color.BLACK)
+object WHITE_0: Number(0, Color.WHITE)
 
 object BLACK_1 : Number(1, Color.BLACK)
 object WHITE_1: Number(1, Color.WHITE)
