@@ -65,6 +65,10 @@ class Player(val name: String, val cardsCombinations: MutableList<out List<Tile>
         cardsCombinations.removeIf { it.filter { n -> n.number % 2 != 0 }.size != value }
     }
 
+    fun countOfEven(value: Int) {
+        cardsCombinations.removeIf { it.filter { n -> n.number % 2 == 0 }.size != value }
+    }
+
     fun tilesHaveSameNumber(value: Int) {
         cardsCombinations.removeIf {
             val countMap = it.groupingBy { it.number }.eachCount()
@@ -132,7 +136,10 @@ class Board(val me: Me, val players: List<Player>) {
     companion object {
         fun build(meTiles: String, playerNames: List<String>): Board {
             val me = Me(meTiles.toTiles())
-            val combos = Combinatorics.combinations(ALL_CARDS.subtract(me.tiles), 5).toMutableList()
+            val combos = Combinatorics.combinations(ALL_CARDS.subtract(me.tiles), 5)
+                .toMutableList()
+                .distinctBy { it.toString() }
+                .toMutableList()
             return Board(me = me, players = playerNames.map { name ->
                 Player(name, combos)
             })
@@ -142,17 +149,18 @@ class Board(val me: Me, val players: List<Player>) {
 
 fun main() {
     val board = Board.build(
-        meTiles = "1w 3b 4b 4w 9b",
-        playerNames = listOf("christina")
+        meTiles = "2w 3w 3b 4w 5",
+        playerNames = listOf("CL")
     )
     val versus = board.players[0]
 
     // Elimination time
-    versus.sumOfCentral(13)
-    versus.consecutive("ab")
-    versus.neighbouringSameColor("ab cd")
-    versus.sumOfRightMost(17)
+    versus.noTile(6)
+    versus.consecutive("bcd")
+    versus.maxMinGap(9)
+    versus.numOfBlack(2)
+
 
     // Print
-    println(versus)
+     println(versus)
 }
