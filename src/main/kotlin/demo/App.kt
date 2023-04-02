@@ -4,16 +4,16 @@ import com.github.shiguruikai.combinatoricskt.Combinatorics
 
 val ALL_CARDS = TwoPlayerSetup.cards
 
-class Player(val name: String, val cardsCombinations: MutableList<out List<Number>>) {
+class Player(val name: String, val cardsCombinations: MutableList<out List<Tile>>) {
     override fun toString() = "[$name]: \n" +
             cardsCombinations.joinToString("\n") + "\n" +
             "Count: ${cardsCombinations.size}"
 
-    fun number(pos: Int, value: Int) {
+    fun hasTile(pos: Int, value: Int) {
         cardsCombinations.removeIf { it[pos].number != value }
     }
 
-    fun noNumber(value: Int) {
+    fun noTile(value: Int) {
         cardsCombinations.removeIf { it.filter { n -> n.number == value }.isNotEmpty() }
     }
 
@@ -95,6 +95,8 @@ class Player(val name: String, val cardsCombinations: MutableList<out List<Numbe
         }
     }
 
+    fun neighbouringSameColor(value: String) = neighbouringSameColor(value.toPosList())
+
     fun noConsecutive() {
         cardsCombinations.removeIf {
             it.zipWithNext().forEach { pair ->
@@ -118,24 +120,38 @@ class Player(val name: String, val cardsCombinations: MutableList<out List<Numbe
             return@removeIf false
         }
     }
+
+    fun consecutive(value: String) = consecutive(value.toPosList())
 }
 
-class Me(val numbers: Set<Number>) {
-    override fun toString() = "[ME]: $numbers"
+class Me(val tiles: Set<Tile>) {
+    override fun toString() = "[ME]: $tiles"
+}
+
+class Board(val me: Me, val players: List<Player>) {
+    companion object {
+        fun build(meTiles: String, playerNames: List<String>): Board {
+            val me = Me(meTiles.toTiles())
+            val combos = Combinatorics.combinations(ALL_CARDS.subtract(me.tiles), 5).toMutableList()
+            return Board(me = me, players = playerNames.map { name ->
+                Player(name, combos)
+            })
+        }
+    }
 }
 
 fun main() {
-    val me = Me(numbers = setOf(WHITE_0, WHITE_1, WHITE_2, GREEN_5a, BLACK_6))
-    val combinations = Combinatorics.combinations(ALL_CARDS.subtract(me.numbers), 5).toMutableList()
-    val versus = Player("Christina", combinations)
+    val board = Board.build(
+        meTiles = "1w 3b 4b 4w 9b",
+        playerNames = listOf("christina")
+    )
+    val versus = board.players[0]
 
     // Elimination time
-    versus.sumOfBlack(16)
-    versus.tilesHaveSameNumber(0)
-    versus.consecutive(listOf(listOf(1, 2, 3)))
-    versus.sumOfTiles(30)
-    versus.number(1, 5)
-    versus.noNumber(8)
+    versus.sumOfCentral(13)
+    versus.consecutive("ab")
+    versus.neighbouringSameColor("ab cd")
+    versus.sumOfRightMost(17)
 
     // Print
     println(versus)
