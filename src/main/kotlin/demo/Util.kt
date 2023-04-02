@@ -21,6 +21,9 @@ fun Char.toPos(): Int {
     }
 }
 
+/**
+ * Transform string such "0b 5 1b 2b 3b" to its respective tile object
+ */
 fun String.toTiles(): Set<Tile> {
     val tiles = this.split(" ").map {
         when (it) {

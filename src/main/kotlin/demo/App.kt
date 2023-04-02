@@ -1,17 +1,46 @@
 package demo
 
 import com.github.shiguruikai.combinatoricskt.Combinatorics
+import java.lang.IllegalStateException
 
 val ALL_CARDS = TwoPlayerSetup.cards
 
 class Player(val name: String, val cardsCombinations: MutableList<out List<Tile>>) {
-    override fun toString() = "[$name]: \n" +
-            cardsCombinations.joinToString("\n") + "\n" +
-            "Count: ${cardsCombinations.size}"
+    override fun toString(): String {
+        val distinctMap = (0..4).map { columnIndex -> cardsCombinations.map { it[columnIndex] }.distinct() }
+//        val distinctMapSize = distinctMap.fold(0) { acc, i -> if (i.size > acc) i.size else acc }
+//        val printing = (0..distinctMapSize).map { columnIndex ->
+//            if (distinctMap.getOrNull(columnIndex))
+//        }
+        val distinctPrint = distinctMap
+            .mapIndexed { i, tile -> "$i: $tile" }
+        return "[$name]: \n" +
+                cardsCombinations.joinToString("\n") + "\n\n" +
+                "Distinct: \n" +
+                distinctPrint.joinToString("\n") + "\n\n" +
+                "Count: ${cardsCombinations.size}"
+    }
 
     fun hasTile(pos: Int, value: Int) {
+        if (value == 5) throw IllegalStateException("Can't input 5")
         cardsCombinations.removeIf { it[pos].number != value }
     }
+
+    fun hasTile(pos: Char, value: Int) = hasTile(pos.toPos(), value)
+
+    fun has5Tile(pos: Int) {
+        cardsCombinations.removeIf { it ->
+            it[pos].number != 5 || it.filter { it.number == 5 }.size > 1
+        }
+    }
+
+    fun has5Tile(pos: Char) = has5Tile(pos.toPos())
+
+    fun has5Tiles(pos1: Int, pos2: Int) {
+        cardsCombinations.removeIf { !(it[pos1].number == 5 && it[pos2].number == 5) }
+    }
+
+    fun has5Tiles(pos1: Char, pos2: Char) = has5Tiles(pos1.toPos(), pos2.toPos())
 
     fun noTile(value: Int) {
         cardsCombinations.removeIf { it.filter { n -> n.number == value }.isNotEmpty() }
@@ -41,11 +70,11 @@ class Player(val name: String, val cardsCombinations: MutableList<out List<Tile>
         cardsCombinations.removeIf { it.slice(2..4).sum() != value }
     }
 
-    fun numOfBlack(value: Int) {
+    fun countOfBlack(value: Int) {
         cardsCombinations.removeIf { it.filterByColor(Color.BLACK).size != value }
     }
 
-    fun numOfWhite(value: Int) {
+    fun countOfWhite(value: Int) {
         cardsCombinations.removeIf { it.filterByColor(Color.WHITE).size != value }
     }
 
@@ -69,7 +98,7 @@ class Player(val name: String, val cardsCombinations: MutableList<out List<Tile>
         cardsCombinations.removeIf { it.filter { n -> n.number % 2 == 0 }.size != value }
     }
 
-    fun tilesHaveSameNumber(value: Int) {
+    fun hasSameNumber(value: Int) {
         cardsCombinations.removeIf {
             val countMap = it.groupingBy { it.number }.eachCount()
             countMap.toList().filter { it.second >= 2 }.size != value
@@ -138,6 +167,7 @@ class Board(val me: Me, val players: List<Player>) {
             val me = Me(meTiles.toTiles())
             val combos = Combinatorics.combinations(ALL_CARDS.subtract(me.tiles), 5)
                 .toMutableList()
+                // To remove multiple of 5s (green)
                 .distinctBy { it.toString() }
                 .toMutableList()
             return Board(me = me, players = playerNames.map { name ->
@@ -149,18 +179,14 @@ class Board(val me: Me, val players: List<Player>) {
 
 fun main() {
     val board = Board.build(
-        meTiles = "2w 3w 3b 4w 5",
+        meTiles = "0w 2w 7b 8b 8w",
         playerNames = listOf("CL")
     )
-    val versus = board.players[0]
+    val v = board.players[0]
+    v.sumOfWhite(7)
+    v.maxMinGap(9)
+    v.neighbouringSameColor("ab cd")
+    v.consecutive("cd")
 
-    // Elimination time
-    versus.noTile(6)
-    versus.consecutive("bcd")
-    versus.maxMinGap(9)
-    versus.numOfBlack(2)
-
-
-    // Print
-     println(versus)
+    println(v)
 }
