@@ -34,6 +34,5 @@ fun main() {
     v.maxMinGap(9)
     v.neighbouringSameColor("ab cd")
     v.consecutive("cd")
-
     println(v)
 }

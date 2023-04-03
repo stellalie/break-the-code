@@ -53,30 +53,9 @@ class Player(val name: String, val cardsCombinations: MutableList<out List<Tile>
         }
     }
 
-    fun noNeighbouringSameColor() {
-        cardsCombinations.removeIf {
-            for (pair in it.zipWithNext()) {
-                if (pair.first.color == pair.second.color) {
-                    return@removeIf true
-                }
-            }
-            return@removeIf false
-        }
-    }
+    fun noNeighbouringSameColor() = cardsCombinations.retainAll(Predicate.noNeighbouringSameColor())
 
-    fun neighbouringSameColor(value: List<List<Int>>) {
-        cardsCombinations.removeIf { numbers ->
-            value.forEach {
-                // Group all the same color
-                if (it.map { i -> numbers[i].color }.distinct().size != 1) {
-                    return@removeIf true
-                }
-            }
-            return@removeIf false
-        }
-    }
-
-    fun neighbouringSameColor(value: String) = neighbouringSameColor(value.toPosList())
+    fun neighbouringSameColor(value: String) = cardsCombinations.retainAll(Predicate.neighbouringSameColor(value))
 
     fun noConsecutive() = cardsCombinations.retainAll(Predicate.noConsecutive())
 

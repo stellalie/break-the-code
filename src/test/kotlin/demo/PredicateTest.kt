@@ -36,6 +36,20 @@ class PredicateTest {
             TestData(input = "0b 0w 5 7w 9b", expected = true),
             TestData(input = "0b 2b 3w 4w 9b", expected = false)
         )
+
+        @JvmStatic
+        private fun testNeighbouringSameColor() = Stream.of(
+            TestData(input = "2b 3w 4b 7b 9w", expected = true),
+            TestData(input = "2w 4b 5 5 9b", expected = true),
+            TestData(input = "2b 4b 5 5 9b", expected = false)
+        )
+
+        @JvmStatic
+        private fun testNoNeighbouringSameColor() = Stream.of(
+            TestData(input = "2b 3w 4b 7w 9b", expected = true),
+            TestData(input = "2w 3w 4b 7w 9b", expected = false),
+            TestData(input = "2w 4b 5 5 9b", expected = false)
+        )
     }
 
     @ParameterizedTest
@@ -56,6 +70,17 @@ class PredicateTest {
         smartAssert(Predicate.noConsecutive()(data.input.toTilesList()), data.expected)
     }
 
+    @ParameterizedTest
+    @MethodSource("testNeighbouringSameColor")
+    fun testNeighbouringSameColor(data: TestData) {
+        smartAssert(Predicate.neighbouringSameColor("cd")(data.input.toTilesList()), data.expected)
+    }
+
+    @ParameterizedTest
+    @MethodSource("testNoNeighbouringSameColor")
+    fun testNoNeighbouringSameColor(data: TestData) {
+        smartAssert(Predicate.noNeighbouringSameColor()(data.input.toTilesList()), data.expected)
+    }
 
     private fun smartAssert(actual: Boolean, expected: Boolean) {
         when (expected) {

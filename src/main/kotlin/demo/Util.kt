@@ -28,7 +28,9 @@ fun String.toTilesSet(): Set<Tile> = this.toTilesList().toSet()
 
 fun String.toTilesList(): List<Tile> = this.split(" ").map {
     when (it) {
-        "5" -> GREEN_5a
+        // greens
+        // and, this shouldn't matter. We would know where to look if there's flakiness
+        "5" -> listOf(GREEN_5a, GREEN_5b).shuffled()[0]
         // blacks
         "0b" -> BLACK_0
         "1b" -> BLACK_1
@@ -52,3 +54,21 @@ fun String.toTilesList(): List<Tile> = this.split(" ").map {
         else -> throw IllegalArgumentException("Invalid tile $this")
     }
 }
+
+const val ANSI_RESET = "\u001B[0m"
+const val ANSI_BLACK = "\u001B[30m"
+const val ANSI_RED = "\u001B[31m"
+const val ANSI_GREEN = "\u001B[32m"
+const val ANSI_YELLOW = "\u001B[33m"
+const val ANSI_BLUE = "\u001B[34m"
+const val ANSI_PURPLE = "\u001B[35m"
+const val ANSI_CYAN = "\u001B[36m"
+const val ANSI_WHITE = "\u001B[37m"
+const val ANSI_BLACK_BACKGROUND = "\u001B[40m"
+const val ANSI_RED_BACKGROUND = "\u001B[41m"
+const val ANSI_GREEN_BACKGROUND = "\u001B[42m"
+const val ANSI_YELLOW_BACKGROUND = "\u001B[43m"
+const val ANSI_BLUE_BACKGROUND = "\u001B[44m"
+const val ANSI_PURPLE_BACKGROUND = "\u001B[45m"
+const val ANSI_CYAN_BACKGROUND = "\u001B[46m"
+const val ANSI_WHITE_BACKGROUND = "\u001B[47m"
